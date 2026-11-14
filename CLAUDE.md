@@ -18,7 +18,7 @@
 - `scripts/capture.mjs`: records `site/media/demo.gif` and `site/media/og.jpg` from the built site with Playwright (fake clock, seeded `Math.random`) and ffmpeg. Re-run after visible site or effect changes.
 - `scripts/fidelity.mjs`: Playwright check that the image overlay covers the img content box and its base frame matches the real img, across object-fit / object-position / border / padding cases and inside `<picture>`, and that the visible overlay covers a transformed img, including a transform changed while playing.
 - `.github/workflows/ci.yml`: on push to `main`, pull requests and manual runs: typecheck, unit tests, build, `check:package`, site build, smoke and fidelity; then, on `main` of this repository, deploys `site/dist` to GitHub Pages.
-- `.github/workflows/release.yml`: on a `vX.Y.Z` tag matching `package.json`: the CI checks, `npm stage publish --provenance` (trusted publishing, environment `npm`; the owner approves with 2FA), and a draft GitHub release with that version's `CHANGELOG.md` entry. A manual run stops at `npm publish --dry-run`.
+- `.github/workflows/release.yml`: on a `vX.Y.Z` tag matching `package.json`: the CI checks, `npm stage publish --provenance` (trusted publishing, environment `npm`; the owner approves with 2FA), and a draft GitHub release with that version's `CHANGELOG.md` entry. A manual run ends with `npm pack --dry-run`.
 
 ## Commands
 
