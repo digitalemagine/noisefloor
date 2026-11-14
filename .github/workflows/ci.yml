@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck, test, build, smoke, fidelity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:package
+      - run: npm run build:site
+      # The npm smoke and fidelity scripts rebuild first; dist/ and site/dist/ are already built here.
+      - run: node scripts/smoke.mjs
+      - run: node scripts/fidelity.mjs
+      # GitHub Pages is not available for private repositories on the Free plan: deploy only once the repo is public.
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && github.event.repository.visibility == 'public'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+  pages:
+    name: Deploy site to GitHub Pages
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && github.event.repository.visibility == 'public'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

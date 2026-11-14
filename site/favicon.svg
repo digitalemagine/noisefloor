@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#0c0d18"/>
+  <!-- a signal trace with a tear: RGB split on the broken segment -->
+  <path d="M4 20h6l3-9 3 11 2-6h10" fill="none" stroke="#ff2bd6" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" transform="translate(-1.2 0)"/>
+  <path d="M4 20h6l3-9 3 11 2-6h10" fill="none" stroke="#00f0ff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" transform="translate(1.2 0)"/>
+  <path d="M4 20h6l3-9 3 11 2-6h10" fill="none" stroke="#eef0ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <rect x="17" y="8" width="11" height="1.6" fill="#f5ff3b"/>
+</svg>

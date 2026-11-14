@@ -1,0 +1,86 @@
+{
+  "name": "noisefloor",
+  "version": "0.1.0",
+  "description": "Analog-video glitch effects for text and images: per-character scramble, canvas image glitch, ambient micro-glitches. Zero dependencies.",
+  "license": "MIT",
+  "homepage": "https://digitalemagine.github.io/noisefloor/",
+  "author": "digitalemagine",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitalemagine/noisefloor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/digitalemagine/noisefloor/issues"
+  },
+  "keywords": [
+    "glitch",
+    "scramble",
+    "text-effect",
+    "crt",
+    "cyberpunk",
+    "canvas",
+    "animation",
+    "text-scramble",
+    "decrypt",
+    "glitch-effect",
+    "typescript"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/noisefloor.d.ts",
+        "default": "./dist/noisefloor.js"
+      },
+      "require": {
+        "types": "./dist/noisefloor.d.cts",
+        "default": "./dist/noisefloor.cjs"
+      }
+    },
+    "./auto": {
+      "import": {
+        "types": "./dist/auto.d.ts",
+        "default": "./dist/auto.js"
+      },
+      "require": {
+        "types": "./dist/auto.d.cts",
+        "default": "./dist/auto.cjs"
+      }
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/noisefloor.cjs",
+  "module": "./dist/noisefloor.js",
+  "types": "./dist/noisefloor.d.ts",
+  "unpkg": "./dist/noisefloor.iife.js",
+  "jsdelivr": "./dist/noisefloor.iife.js",
+  "sideEffects": [
+    "*.css",
+    "./dist/auto.*",
+    "./dist/noisefloor.auto.iife.js"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsdown && node scripts/build-css.mjs",
+    "check:package": "publint --strict && attw --pack . --profile node16 --exclude-entrypoints style.css && node scripts/treeshake.mjs",
+    "typecheck": "tsc --noEmit && tsc -p site",
+    "test": "vitest run",
+    "build:site": "node scripts/build-site.mjs",
+    "smoke": "npm run build && npm run build:site && node scripts/smoke.mjs",
+    "fidelity": "npm run build && npm run build:site && node scripts/fidelity.mjs",
+    "capture": "npm run build && npm run build:site && node scripts/capture.mjs"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@vitest/browser-playwright": "^5.0.3",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.63.0",
+    "publint": "^0.3.25",
+    "tsdown": "^0.23.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

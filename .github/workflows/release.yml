@@ -1,0 +1,73 @@
+name: Release
+
+# Pushing a tag vX.Y.Z (matching package.json) runs every check, publishes to npm with
+# provenance, and creates the GitHub release from that version's CHANGELOG.md entry.
+# A manual run does everything except publishing: `npm publish --dry-run`, no release.
+#
+# npm authentication: trusted publishing (OIDC; on npmjs.com, package settings: repository
+# digitalemagine/noisefloor, workflow release.yml, environment npm), so no token is stored.
+# If npm cannot configure it before the package exists, the first run uses a short-lived
+# granular token in the NPM_TOKEN secret; then configure trusted publishing and delete it.
+# Provenance needs a public repository.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Check, publish, GitHub release
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write # create the GitHub release
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26 # npm 11: trusted publishing needs 11.5.1 or later
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Tag matches package.json version
+        if: github.ref_type == 'tag'
+        run: |
+          v="v$(node -p "require('./package.json').version")"
+          [ "$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME does not match package.json $v"; exit 1; }
+      # Same checks as ci.yml.
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:package
+      - run: npm run build:site
+      - run: node scripts/smoke.mjs
+      - run: node scripts/fidelity.mjs
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          awk -v v="$version" '$0 ~ "^## " v "( |$)" { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          [ -s "$RUNNER_TEMP/notes.md" ] || { echo "CHANGELOG.md has no entry for $version"; exit 1; }
+          cat "$RUNNER_TEMP/notes.md"
+      - name: Publish to npm
+        if: github.ref_type == 'tag'
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm (dry run)
+        if: github.ref_type != 'tag'
+        run: npm publish --dry-run --access public
+      - name: GitHub release
+        if: github.ref_type == 'tag'
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+site/dist/
+*.log
+.DS_Store
+.vitest/
+# full-resolution originals of the site illustrations; only the reduced .webp copies are committed
+site/media/*.jpeg
+site/media/*.jpg
+!site/media/og.jpg
+site/media/*.png

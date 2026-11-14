@@ -1,0 +1,26 @@
+# Roadmap
+
+Pending work in order. Remove items once done; rationale belongs in `DESIGN.md`.
+
+## 1. Release 0.1.0
+
+- Make the repository public. Then GitHub Pages: Settings, Pages, Source "GitHub Actions", run the CI workflow, and set the repo website field (`gh repo edit --homepage https://digitalemagine.github.io/noisefloor/`). Check that the site, the README GIF and the Open Graph image load (on GitHub, and in a link preview).
+- Publish: on npmjs.com add a trusted publisher for `noisefloor` (repository `digitalemagine/noisefloor`, workflow `release.yml`, environment `npm`); if npm only allows it once the package exists, put a short-lived granular token in the `NPM_TOKEN` repository secret for the first run, then add the trusted publisher and delete the secret. Then `git tag v0.1.0 && git push origin v0.1.0` runs `.github/workflows/release.yml` (checks, publish with provenance, GitHub release). Check the npm page (README, GIF, provenance badge).
+
+## Later
+
+- CSP without a separate stylesheet: a `nonce` setting in `configure()`, set on the injected `<style>`, if `style.css` proves inconvenient. Not `adoptedStyleSheets` (see `DESIGN.md`, "CSS injection").
+- `noisefloor/auto` scoping, only if observer cost shows up: benchmark the page-wide MutationObserver under heavy DOM churn; if needed, a Stimulus-style `start(root)` (needs a way to skip the automatic start) and a `data-nf-ignore` subtree opt-out. No page-level gate attribute: importing the entry point is the opt-in.
+- `<video>` support for Glitch (VFX-JS has it).
+- Paragraph-scale Scramble, if asked for (decoding or typing in body text). Scramble is per character, which is too many elements and per-frame restyles for long text. First benchmark the current mode on long text; then a per-word mode (word cells sized like character cells, so the layout still never moves), with lighter styling (glyph swaps and palette colour, no per-character jitter, skew or glow) and tear and glitch lines per line rather than per character; likely `granularity: 'word'` on Scramble rather than a new class. Wrapping must not change while scrambling.
+- Thin framework wrappers under `@digitalemagine/` if recipes prove insufficient.
+
+## Separate track: CodePen showcase
+
+Goal: a demo polished enough to be picked for the CodePen Spark newsletter. Independent of the items above; needs its own discussion before any work.
+
+Open questions:
+
+- Form: a dedicated pen, a page of the project site, or pen code derived from the site.
+- Library source in the pen: the published bundle from unpkg/jsdelivr (requires the npm release) or the source pasted in.
+- Concept and content of the showcase itself.

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>noisefloor</title>
+<meta name="description" content="Analog-video glitch effects for text and images: per-character text scramble, canvas image glitch and ambient micro-glitches. MIT, zero dependencies.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://digitalemagine.github.io/noisefloor/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="noisefloor">
+<meta property="og:title" content="noisefloor: analog-signal interference for UI">
+<meta property="og:description" content="Analog-video glitch effects for text and images: per-character text scramble, canvas image glitch and ambient micro-glitches. MIT, zero dependencies.">
+<meta property="og:url" content="https://digitalemagine.github.io/noisefloor/">
+<meta property="og:image" content="https://digitalemagine.github.io/noisefloor/media/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The noisefloor demo: a menu and headline mid-scramble, two images mid-glitch">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <div class="site-in">
+    <a class="brand" href="#top" aria-label="noisefloor home">NOISE<b>FLOOR</b></a>
+    <nav class="menu" aria-label="Sections">
+      <a class="navlink" href="#demo"><span data-ss data-group="nav">Demo</span></a>
+      <a class="navlink" href="#playground"><span data-ss data-group="nav">Playground</span></a>
+      <a class="navlink" href="#start"><span data-ss data-group="nav">Get started</span></a>
+      <a class="navlink" href="#api"><span data-ss data-group="nav">API</span></a>
+      <a class="navlink" href="#about"><span data-ss data-group="nav">About</span></a>
+    </nav>
+  </div>
+</header>
+
+<!-- The playground controls beside the page on wide screens (main.js moves #controls in and out) -->
+<aside class="tune" id="tune" aria-labelledby="tune-h" hidden>
+  <div class="tune-head">
+    <p class="tune-title" id="tune-h">Playground</p>
+    <button class="tune-x" id="tune-close" type="button" aria-label="Close playground">&times;</button>
+  </div>
+  <p class="tune-note">Applies live to every effect on the page.</p>
+  <div class="tune-body" id="tune-body"></div>
+  <div class="tune-foot">
+    <button class="btn" id="tune-replay" type="button">Replay demo</button>
+    <button class="btn" id="tune-copy" type="button">Copy config</button>
+  </div>
+</aside>
+
+<div class="wrap" id="top">
+  <div class="intro">
+    <div class="eyebrow"><span>MIT</span><span>zero dependencies</span><span>text + images</span><span>layout never moves</span></div>
+    <h1 id="title" data-ss>noisefloor</h1>
+    <p class="lede">Analog-video glitch effects for the web: a per-character text scramble, a canvas image glitch, and a scheduler for ambient micro-glitches. One script, no build step, no dependencies. The menu above and the images below are the effects.</p>
+    <div class="cta">
+      <a class="btn btn-hi" href="#start">Get started</a>
+      <button class="btn" type="button" data-pg-toggle>Open playground</button>
+    </div>
+  </div>
+
+  <section id="demo">
+    <h2>Demo</h2>
+    <div class="stage" id="stage">
+      <div class="hero">
+        <span class="kicker">Text &middot; Scramble</span>
+        <button class="hero-line" id="hero" type="button"><span data-ss data-group="text">Reacquiring signal</span></button>
+        <p class="typed"><span id="typed">carrier locked</span></p>
+        <div class="stage-foot">
+          <span class="hint">Hover the headline, the menu, or any image below.</span>
+          <button class="btn" type="button" data-pg-toggle>Open playground</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="images" class="sub">
+    <h3 class="subhead">Images &middot; Glitch</h3>
+    <div class="gallery">
+      <a class="shot" href="#images" id="shot-main">
+        <img id="img-main" class="glitch" alt="Night skyline with a drone under track" width="1600" height="900">
+        <span class="cap"><span data-ss data-group="text">Night skyline</span><small id="main-src">sample, 1600&times;900</small></span>
+      </a>
+      <div class="side">
+        <a class="shot" href="#images">
+          <img id="img-side" class="glitch" src="media/rooftop.webp" alt="Anime illustration: a cyborg girl sitting on a steel beam above a neon city" width="1280" height="714" style="object-position: 64% 50%">
+          <span class="cap"><span data-ss data-group="text" id="side-cap">Neon rooftop</span><small>illustration</small></span>
+        </a>
+      </div>
+    </div>
+    <div class="upload">
+      <label class="btn" for="c-file">Load your own image&hellip;</label>
+      <input type="file" id="c-file" accept="image/*">
+      <button class="btn" type="button" id="c-reset">Restore sample</button>
+      <span class="hint">Replaces the large image. Stays in your browser; nothing is uploaded.</span>
+    </div>
+  </section>
+
+  <section id="playground">
+    <h2>Playground</h2>
+    <p class="pg-note">Every setting applies live to every effect on this page: the scrambled labels (title, menu, headline, captions), the demo images, the ambient micro-glitches and the accent colours. On a wide screen the controls open in a panel beside the page, so the demo above stays in view; the configuration below is the code for what you set.</p>
+    <p class="pg-actions"><button class="btn" type="button" data-pg-toggle>Open playground</button></p>
+    <div class="pg-body" id="pg-body" hidden><!-- bounds the sticky preview to the controls -->
+    <div class="pg-preview" id="pg-preview">
+      <button class="pg-label" type="button" id="pg-label"><span data-ss data-group="preview">Signal acquired</span></button>
+      <button class="pg-shot" type="button" id="pg-shot" aria-label="Replay the image glitch"><img id="img-preview" class="glitch" src="media/rooftop.webp" alt="" width="1280" height="714" style="object-position: 64% 50%"></button>
+      <button class="btn" type="button" id="pg-replay">Replay</button>
+    </div>
+    <div class="controls" id="controls"></div>
+    </div>
+    <details class="pg-config">
+      <summary>Your configuration</summary>
+      <pre id="snippet"></pre>
+    </details>
+  </section>
+
+  <section id="start">
+    <h2>Get started</h2>
+    <div class="doc">
+      <ol class="steps">
+        <li>
+          <h3>Include the script</h3>
+          <p>A single file, about 7.5 KB gzipped, with TypeScript types, for Safari 16, Chrome and Edge 107, Firefox 104 and later. It injects its own base CSS, placed first in <code>&lt;head&gt;</code> (or in the shadow root, for elements inside one) so your styles win. Under a Content-Security-Policy that blocks inline styles, load <code>noisefloor/style.css</code> instead and call <code>configure({ injectCSS: false })</code> before creating instances.</p>
+          <pre>npm i noisefloor
+import { Scramble, Glitch, Ambient } from 'noisefloor';
+
+// or, without a bundler: one script tag, one global
+&lt;script src="https://unpkg.com/noisefloor"&gt;&lt;/script&gt;
+const { Scramble, Glitch, Ambient } = Noisefloor;</pre>
+        </li>
+        <li>
+          <h3>Use the markup you have</h3>
+          <p>Effects apply to the elements you already have. Text is split into characters at runtime; images keep their <code>&lt;img&gt;</code> element, which Glitch wraps in a positioned span (or in a parent you mark <code>data-nf-wrap</code>).</p>
+          <pre>&lt;nav&gt;
+  &lt;a href="#docs"&gt;&lt;span class="label"&gt;Docs&lt;/span&gt;&lt;/a&gt;
+  &lt;a href="#about"&gt;&lt;span class="label"&gt;About&lt;/span&gt;&lt;/a&gt;
+&lt;/nav&gt;
+&lt;img class="glitch" src="feed.jpg" alt="Camera feed"&gt;</pre>
+        </li>
+        <li class="alt-a">
+          <h3>Bind from JavaScript</h3>
+          <p><code>bind()</code> takes any CSS selector, wraps every match and plays on hover or focus of the closest link or button. Add <code>Ambient</code> for random micro-glitches.</p>
+          <pre>const labels = Scramble.bind('nav a .label');
+const images = Glitch.bind('img.glitch');
+new Ambient([...labels, ...images], { rate: 30, amount: 0.25 });</pre>
+        </li>
+        <li class="alt-b">
+          <h3>Or declare it in HTML</h3>
+          <p>For static pages and CMS content: import <code>noisefloor/auto</code> once, or load <code>noisefloor.auto.iife.js</code> (the library plus auto-init, about 8.5 KB gzipped) instead of the plain script. Options are attributes; elements added later are set up and removed ones destroyed.</p>
+          <pre>&lt;script src="https://unpkg.com/noisefloor/dist/noisefloor.auto.iife.js"&gt;&lt;/script&gt;
+
+&lt;a href="#docs"&gt;&lt;span data-nf="scramble" data-nf-order="center"&gt;Docs&lt;/span&gt;&lt;/a&gt;
+&lt;img data-nf="glitch" data-nf-rgb-split="6" data-nf-ambient src="feed.jpg" alt="Camera feed"&gt;</pre>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="api">
+    <div class="subnav">
+      <h2>API</h2>
+      <nav aria-label="API">
+        <a href="#api-scramble">Scramble</a>
+        <a href="#api-glitch">Glitch</a>
+        <a href="#api-ambient">Ambient</a>
+        <a href="#api-configure">configure</a>
+        <a href="#api-auto">auto</a>
+        <a href="#frameworks">Frameworks</a>
+        <a href="#how">How it works</a>
+      </nav>
+    </div>
+    <div class="doc api">
+      <article id="api-scramble">
+        <h3><code>new Scramble(element, options)</code></h3>
+        <p>Per-character text scramble. The element's text (or its <code>data-text</code>) becomes the label; a second instance on the same element replaces the first. Child elements are not kept: <code>&lt;b&gt;</code>, icons and other markup inside the element are replaced by its plain text, so target an element that holds only text. Each user-perceived character is animated on its own, so joined scripts such as Arabic or Devanagari render unjoined. Made for labels and headings, not paragraphs: every character is its own element, restyled on each frame.</p>
+        <ul class="methods">
+          <li><code>.play()</code> full scramble; characters lock in <code>order</code></li>
+          <li><code>reveal: 'type'</code> types the label in <code>order</code> instead, each character scrambling for <code>trail</code> before it locks; <code>cursor: true</code> adds a block caret at the typing head. The run fits the text into <code>duration</code>; <code>speed</code> types at a fixed number of characters per second instead, so longer labels take longer: <code>{ reveal: 'type', speed: 30, cursor: true }</code></li>
+          <li><code>.play({ text })</code> scramble to a new label: the width changes once when it starts, then nothing moves; the accessible label and <code>.text</code> update at once. Reserve the widest label with <code>min-width</code> on the element to avoid even that move.</li>
+          <li><code>.burst({ amount, count, duration, intensity })</code> micro-glitch on part of the label; ignored while playing</li>
+          <li><code>.set(options)</code> update options, safe while playing</li>
+          <li><code>.finished</code> promise resolved with the instance when the current animation ends (naturally, by <code>finish()</code> or <code>destroy()</code>); already resolved when idle, never rejects: <code>await label.play().finished</code></li>
+          <li><code>.finish()</code> jump to rest &middot; <code>.destroy()</code> restore plain text &middot; <code>.running</code> true while animating &middot; <code>.destroyed</code> true after destroy, when the other methods do nothing &middot; <code>.options</code> the current options, read-only (change them with <code>set()</code>)</li>
+          <li><code>Scramble.bind(targets, options, { trigger, host, once })</code> returns instances. <code>trigger</code>: an event name (default <code>mouseenter</code>, which also plays on focus) or <code>'visible'</code>, when the host scrolls into view (labels already in view play at once); <code>once: true</code> plays on the first trigger only. Typed reveal on scroll: <code>Scramble.bind('h2', { reveal: 'type', cursor: true }, { trigger: 'visible', once: true })</code></li>
+        </ul>
+        <details class="opts">
+          <summary>Options <span id="opt-text-n"></span></summary>
+          <div class="tbl"><table id="opt-text"></table></div>
+        </details>
+      </article>
+      <article id="api-glitch">
+        <h3><code>new Glitch(img, options)</code></h3>
+        <p>Canvas image glitch over an existing <code>&lt;img&gt;</code>. Wraps it (or its <code>&lt;picture&gt;</code>) in a positioned span, or reuses a parent marked <code>data-nf-wrap</code>; a second instance on the same img replaces the first. Honours <code>object-fit</code> and <code>object-position</code>.</p>
+        <ul class="methods">
+          <li><code>.play()</code> &middot; <code>.burst({ amount, duration, intensity })</code> &middot; <code>.set(options)</code> &middot; <code>.finish()</code> &middot; <code>.finished</code> &middot; <code>.destroy()</code> &middot; <code>.running</code> &middot; <code>.destroyed</code> &middot; <code>.options</code> &middot; <code>.ready</code> true once the image is loaded and measured</li>
+          <li><code>Glitch.bind(targets, options, { trigger, host, once })</code> returns instances; same triggers as <code>Scramble.bind</code></li>
+        </ul>
+        <details class="opts">
+          <summary>Options <span id="opt-img-n"></span></summary>
+          <div class="tbl"><table id="opt-img"></table></div>
+        </details>
+      </article>
+      <article id="api-ambient">
+        <h3><code>new Ambient(targets, options)</code></h3>
+        <p>Fires <code>burst()</code> on a random idle target at random intervals. Accepts any mix of text and image instances and drops destroyed ones; skips while the tab is hidden.</p>
+        <ul class="methods">
+          <li><code>.fire()</code> one micro-glitch now &middot; <code>.set(options)</code> &middot; <code>.setTargets(targets)</code> &middot; <code>.start()</code> &middot; <code>.stop()</code> &middot; <code>.destroy()</code> stop for good (targets are not destroyed) &middot; <code>.options</code></li>
+        </ul>
+        <details class="opts">
+          <summary>Options <span id="opt-amb-n"></span></summary>
+          <div class="tbl"><table id="opt-amb"></table></div>
+        </details>
+      </article>
+      <article id="api-configure">
+        <h3><code>configure(options)</code></h3>
+        <p>Library-wide settings. <code>injectCSS: false</code> stops the base stylesheet from being inserted, for pages that load <code>noisefloor/style.css</code> themselves, such as under a Content-Security-Policy without <code>'unsafe-inline'</code> in <code>style-src</code>. It applies to documents and shadow roots not styled yet, so call it before creating instances.</p>
+      </article>
+      <article id="api-auto">
+        <h3><code>noisefloor/auto</code></h3>
+        <p>Effects declared in HTML attributes. Importing the module (or loading <code>noisefloor.auto.iife.js</code>, the full library plus auto-init) scans the document when it is ready and watches it: elements added later are set up, removed ones are destroyed, and changing <code>data-nf</code> rebuilds the effect. Other attributes are read once; elements that already have an instance are skipped. Not for markup a framework renders: use the recipes below.</p>
+        <ul class="methods">
+          <li><code>data-nf</code> <code>scramble</code> or <code>glitch</code> (an <code>&lt;img&gt;</code> only)</li>
+          <li><code>data-nf-&lt;option&gt;</code> any effect option, in kebab case (<code>data-nf-rgb-split</code>) or as one word; booleans are true when present and false with <code>"false"</code>; <code>data-nf-palette</code> is a comma-separated list</li>
+          <li><code>data-nf-trigger</code> as <code>bind()</code>'s <code>trigger</code>, or <code>none</code> &middot; <code>data-nf-once</code> &middot; <code>data-nf-ambient</code> join one shared Ambient</li>
+          <li><code>scan(root)</code> set up a root the observer does not see, such as a shadow root &middot; <code>start()</code> &middot; <code>stop()</code> destroy every attribute instance &middot; <code>ambient()</code> the shared Ambient: <code>ambient().set({ rate: 12 })</code>. The script-tag bundle exposes them as <code>Noisefloor.auto</code>.</li>
+        </ul>
+      </article>
+      <article id="frameworks">
+        <h3>Frameworks</h3>
+        <p>React, Vue and Svelte own the nodes they render, while Scramble replaces an element's children and Glitch moves the img into a wrapper. Without care, the next render corrupts the label or throws (React: <code>insertBefore ... is not a child of this node</code>). Three rules keep them apart:</p>
+        <ul class="methods"><li><b>Render the label once</b>, then change it with <code>play({ text })</code>: the framework never patches the text node Scramble replaced. React: the first value from <code>useState</code>; Vue: <code>v-once</code>; Svelte: <code>untrack</code>.</li><li><b>Wrap the img in an element marked <code>data-nf-wrap</code>.</b> Glitch uses it instead of inserting its own wrapper, so the img stays where the framework put it.</li><li><b>Create instances after mount and <code>destroy()</code> them on unmount.</b> Options are read at mount; change them later with <code>set()</code>.</li></ul>
+        <p>Checked with React 19 (StrictMode), Vue 3.5 and Svelte 5.</p>
+        <details class="opts">
+          <summary>React</summary>
+          <pre>// ScrambleText.jsx
+import { useEffect, useRef, useState } from 'react';
+import { Scramble } from 'noisefloor';
+
+export function ScrambleText({ text, options, bindOptions }) {
+  const ref = useRef(null);
+  const inst = useRef(null);
+  // Rendered once: Scramble owns the children from then on; later text goes through play().
+  const [initial] = useState(text);
+
+  useEffect(() =&gt; {
+    const [s] = Scramble.bind(ref.current, options, bindOptions);
+    inst.current = s;
+    return () =&gt; s.destroy();
+  }, []);
+
+  useEffect(() =&gt; {
+    const s = inst.current;
+    if (s &amp;&amp; s.text !== text) s.play({ text });
+  }, [text]);
+
+  return &lt;span ref={ref}&gt;{initial}&lt;/span&gt;;
+}
+
+// GlitchImage.jsx
+import { useEffect, useRef } from 'react';
+import { Glitch } from 'noisefloor';
+
+export function GlitchImage({ options, bindOptions, ...img }) {
+  const ref = useRef(null);
+
+  useEffect(() =&gt; {
+    const [g] = Glitch.bind(ref.current, options, bindOptions);
+    return () =&gt; g.destroy();
+  }, []);
+
+  // data-nf-wrap: Glitch uses this span instead of moving the img into its own wrapper.
+  return (
+    &lt;span data-nf-wrap="" style={{ display: 'inline-block' }}&gt;
+      &lt;img ref={ref} {...img} /&gt;
+    &lt;/span&gt;
+  );
+}</pre>
+        </details>
+        <details class="opts">
+          <summary>Vue</summary>
+          <pre>&lt;!-- ScrambleText.vue --&gt;
+&lt;script setup&gt;
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Scramble } from 'noisefloor';
+
+const props = defineProps({ text: { type: String, required: true }, options: Object, bindOptions: Object });
+const el = ref(null);
+let s = null;
+
+onMounted(() =&gt; { [s] = Scramble.bind(el.value, props.options, props.bindOptions); });
+watch(() =&gt; props.text, (text) =&gt; { if (s) s.play({ text }); });
+onBeforeUnmount(() =&gt; { if (s) s.destroy(); });
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- v-once: Vue renders the first text and never patches it; later text goes through play() --&gt;
+  &lt;span ref="el" v-once&gt;{{ text }}&lt;/span&gt;
+&lt;/template&gt;
+
+&lt;!-- GlitchImage.vue --&gt;
+&lt;script setup&gt;
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { Glitch } from 'noisefloor';
+
+const props = defineProps({ src: String, alt: String, options: Object, bindOptions: Object });
+const img = ref(null);
+let g = null;
+
+onMounted(() =&gt; { [g] = Glitch.bind(img.value, props.options, props.bindOptions); });
+onBeforeUnmount(() =&gt; { if (g) g.destroy(); });
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- data-nf-wrap: Glitch uses this span instead of moving the img into its own wrapper --&gt;
+  &lt;span data-nf-wrap style="display: inline-block"&gt;&lt;img ref="img" :src="src" :alt="alt"&gt;&lt;/span&gt;
+&lt;/template&gt;</pre>
+        </details>
+        <details class="opts">
+          <summary>Svelte</summary>
+          <pre>&lt;!-- ScrambleText.svelte --&gt;
+&lt;script&gt;
+  import { untrack } from 'svelte';
+  import { Scramble } from 'noisefloor';
+
+  let { text, options, bindOptions } = $props();
+  // Rendered once: Scramble owns the children from then on; later text goes through play().
+  const initial = untrack(() =&gt; text);
+
+  function scramble(node, text) {
+    const [s] = Scramble.bind(node, options, bindOptions);
+    return {
+      update(next) { s.play({ text: next }); },
+      destroy() { s.destroy(); }
+    };
+  }
+&lt;/script&gt;
+
+&lt;span use:scramble={text}&gt;{initial}&lt;/span&gt;
+
+&lt;!-- GlitchImage.svelte --&gt;
+&lt;script&gt;
+  import { Glitch } from 'noisefloor';
+
+  let { options, bindOptions, ...img } = $props();
+
+  function glitch(node) {
+    const [g] = Glitch.bind(node, options, bindOptions);
+    return { destroy() { g.destroy(); } };
+  }
+&lt;/script&gt;
+
+&lt;!-- data-nf-wrap: Glitch uses this span instead of moving the img into its own wrapper --&gt;
+&lt;span data-nf-wrap style="display: inline-block"&gt;&lt;img use:glitch {...img} /&gt;&lt;/span&gt;</pre>
+        </details>
+      </article>
+      <article class="notes" id="how">
+        <h3>How it works</h3>
+        <p><b>Text geometry is locked per character.</b> Each glyph animates inside a cell sized by an invisible copy of the real character, so scrambled glyphs, proportional fonts and fallback fonts cannot change layout.</p>
+        <p><b>Only compositor-friendly properties move.</b> JS swaps glyphs and writes CSS custom properties at a stepped frame rate; CSS renders jitter and skew as <code>transform</code>, flicker as <code>opacity</code>, RGB split and glow as <code>text-shadow</code>, and the phosphor decay as transitions.</p>
+        <p><b>Images never touch layout.</b> The <code>&lt;img&gt;</code> keeps its place, alt text and click target. A canvas laid over it appears only while glitching. Channels are separated once by compositing and recombined additively, with no pixel reads, so cross-origin images work without CORS headers.</p>
+        <p><b>Micro-glitches are Poisson-timed.</b> Intervals follow an exponential distribution around the chosen rate, so glitches cluster and pause like real interference.</p>
+        <p><b>Accessible by construction.</b> Real labels live in visually hidden spans, animated layers are <code>aria-hidden</code>, and <code>prefers-reduced-motion</code> disables playback.</p>
+      </article>
+      <details>
+        <summary>Source <span>&mdash; TypeScript, MIT</span></summary>
+        <pre id="src"><!--__SRC__--></pre>
+      </details>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2>About</h2>
+    <div class="about">
+      <div class="who">
+        <span class="kicker">Author</span>
+        <p class="handle"><span data-ss data-group="text">digitalemagine</span></p>
+      </div>
+      <div class="about-body">
+        <p>noisefloor is written and maintained by <b>digitalemagine</b>. It started as a dependency-free experiment with a text-scramble effect, and grew into a small, openly licensed kit for analog-video artefacts on text and images.</p>
+        <p>Released under the MIT licence: use it, fork it, ship it, keep the copyright notice.</p>
+        <p class="meta"><span>v<!--__VERSION__--></span><span>MIT</span><span>&copy; 2026 digitalemagine</span><span><a href="https://github.com/digitalemagine/noisefloor">github.com/digitalemagine/noisefloor</a></span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>noisefloor &middot; &copy; 2026 digitalemagine &middot; MIT</span>
+    <span><a href="https://github.com/digitalemagine/noisefloor">GitHub</a> &middot; <a href="#top">Back to top</a></span>
+  </footer>
+</div>
+
+<script src="noisefloor.iife.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
