@@ -29,8 +29,8 @@ jobs:
       # The npm smoke and fidelity scripts rebuild first; dist/ and site/dist/ are already built here.
       - run: node scripts/smoke.mjs
       - run: node scripts/fidelity.mjs
-      # GitHub Pages is not available for private repositories on the Free plan: deploy only once the repo is public.
-      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && github.event.repository.visibility == 'public'
+      # Deploy the site from main of this repository only (forks have no Pages site to deploy to).
+      - if: github.repository == 'digitalemagine/noisefloor' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
         with:
           path: site/dist
@@ -38,7 +38,7 @@ jobs:
   pages:
     name: Deploy site to GitHub Pages
     needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && github.event.repository.visibility == 'public'
+    if: github.repository == 'digitalemagine/noisefloor' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pages: write
