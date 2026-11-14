@@ -4,7 +4,7 @@ Pending work in order. Remove items once done; rationale belongs in `DESIGN.md`.
 
 ## 1. After 0.1.0
 
-- npm cleanup: set publishing access on the `noisefloor` package to require 2FA and disallow tokens, delete the npm tokens and the secrets on the `npm` environment. The trusted publisher is configured (staged publishing only); the next release confirms it end to end, with the provenance badge.
+- Next release: confirms the staged publishing path end to end (trusted publisher, 2FA approval, provenance badge). Optional tidy-up: delete the two unused secrets on the `npm` environment (their tokens are revoked).
 - Check a link preview of the site (Open Graph image) in a real client.
 
 ## Later
