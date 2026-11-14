@@ -35,6 +35,8 @@ npm run capture      # build, build:site, re-record the README GIF and the Open 
 
 ## Working rules
 
+- Release: set the version in `package.json` (`npm version X.Y.Z --no-git-tag-version`), add its `CHANGELOG.md` entry (`## X.Y.Z (date)`), commit, then tag `vX.Y.Z` and push the tag only when the owner says so; `.github/workflows/release.yml` checks, publishes to npm and creates the GitHub release.
+
 - Behaviour-preserving changes and fixes go in separate commits.
 - Run the unit tests and the smoke test before claiming something works; also the fidelity check when touching image geometry (`src/glitch.ts` layout, transforms or buffers).
 - When a roadmap item is done, remove it from `ROADMAP.md`; record any lasting decision in `DESIGN.md`.

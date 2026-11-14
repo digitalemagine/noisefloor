@@ -2,10 +2,10 @@
 
 Pending work in order. Remove items once done; rationale belongs in `DESIGN.md`.
 
-## 1. Release 0.1.0
+## 1. After 0.1.0
 
-- Make the repository public. Then GitHub Pages: Settings, Pages, Source "GitHub Actions", run the CI workflow, and set the repo website field (`gh repo edit --homepage https://digitalemagine.github.io/noisefloor/`). Check that the site, the README GIF and the Open Graph image load (on GitHub, and in a link preview).
-- Publish: on npmjs.com add a trusted publisher for `noisefloor` (repository `digitalemagine/noisefloor`, workflow `release.yml`, environment `npm`); if npm only allows it once the package exists, put a short-lived granular token in the `NPM_TOKEN` repository secret for the first run, then add the trusted publisher and delete the secret. Then `git tag v0.1.0 && git push origin v0.1.0` runs `.github/workflows/release.yml` (checks, publish with provenance, GitHub release). Check the npm page (README, GIF, provenance badge).
+- npm publishing without tokens: add the trusted publisher on the `noisefloor` package settings (GitHub Actions; repository `digitalemagine/noisefloor`, workflow `release.yml`, environment `npm`), set publishing access to require 2FA and disallow tokens, delete the npm tokens and the secrets on the `npm` environment. The next release then publishes through OIDC only; confirm it shows the provenance badge.
+- Check a link preview of the site (Open Graph image) in a real client.
 
 ## Later
 
