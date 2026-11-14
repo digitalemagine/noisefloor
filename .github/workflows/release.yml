@@ -1,14 +1,14 @@
 name: Release
 
-# Pushing a tag vX.Y.Z (matching package.json) runs every check, publishes to npm with
-# provenance, and creates the GitHub release from that version's CHANGELOG.md entry.
-# A manual run does everything except publishing: `npm publish --dry-run`, no release.
+# Pushing a tag vX.Y.Z (matching package.json) runs every check, stages the version on npm
+# with provenance, and creates a draft GitHub release from that version's CHANGELOG.md entry.
+# A maintainer then approves the staged version with 2FA (npmjs.com, or
+# `npm stage approve <id> --otp=<code>`), which makes it public, and publishes the draft.
+# A manual run does everything except staging and the release: `npm publish --dry-run`.
 #
-# npm authentication: trusted publishing (OIDC; on npmjs.com, package settings: repository
-# digitalemagine/noisefloor, workflow release.yml, environment npm), so no token is stored.
-# If npm cannot configure it before the package exists, the first run uses a short-lived
-# granular token in the NPM_TOKEN secret; then configure trusted publishing and delete it.
-# Provenance needs a public repository.
+# npm authentication: trusted publishing (OIDC; package settings on npmjs.com: repository
+# digitalemagine/noisefloor, workflow release.yml, environment npm, direct publish not allowed),
+# so no token is stored. Provenance needs a public repository.
 
 on:
   push:
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   release:
-    name: Check, publish, GitHub release
+    name: Check, stage on npm, draft GitHub release
     runs-on: ubuntu-latest
     environment: npm
     permissions:
@@ -58,16 +58,14 @@ jobs:
           awk -v v="$version" '$0 ~ "^## " v "( |$)" { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
           [ -s "$RUNNER_TEMP/notes.md" ] || { echo "CHANGELOG.md has no entry for $version"; exit 1; }
           cat "$RUNNER_TEMP/notes.md"
-      - name: Publish to npm
+      - name: Stage on npm (approve with 2FA to publish)
         if: github.ref_type == 'tag'
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm stage publish --provenance --access public
       - name: Publish to npm (dry run)
         if: github.ref_type != 'tag'
         run: npm publish --dry-run --access public
-      - name: GitHub release
+      - name: GitHub release (draft until the npm version is approved)
         if: github.ref_type == 'tag'
-        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
+        run: gh release create "$GITHUB_REF_NAME" --draft --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
         env:
           GH_TOKEN: ${{ github.token }}

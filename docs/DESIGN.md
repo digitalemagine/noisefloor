@@ -145,7 +145,7 @@ The README is the npm page, so it is complete on its own: the positioning line, 
 
 ## Release
 
-Releases are published by `.github/workflows/release.yml` on a `vX.Y.Z` tag that matches `package.json`: the same checks as CI, then `npm publish --provenance`, then a GitHub release whose notes are that version's `CHANGELOG.md` entry. npm authentication is trusted publishing (OIDC), so no long-lived token exists; provenance links each published version to the commit and workflow that built it. The job runs in the `npm` environment, which the trusted publisher names, so protection rules can be added there.
+Releases go through `.github/workflows/release.yml` on a `vX.Y.Z` tag that matches `package.json`: the same checks as CI, then `npm stage publish --provenance`, then a draft GitHub release whose notes are that version's `CHANGELOG.md` entry. The version becomes public only when a maintainer approves it with 2FA, and the draft is published after that. npm authentication is trusted publishing (OIDC) from the `npm` environment, with direct publish not allowed, so no long-lived token exists and neither a compromised GitHub account nor a changed workflow can publish on its own; provenance links each version to the commit and workflow that built it. Staged rather than direct, at the cost of one approval per release, as npm recommends.
 
 ## Package checks
 
